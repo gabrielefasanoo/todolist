@@ -13,6 +13,7 @@ export const TaskProvider = ({ children }) => {
       title,
       completed: false,
       category,
+      priority: 'bassa', // Aggiungiamo la priorità di default
       createdAt: new Date()
     };
     setTasks([...tasks, newTask]);
@@ -34,9 +35,9 @@ export const TaskProvider = ({ children }) => {
     ));
   };
 
-  const editTask = (id, title, category) => {
+  const editTask = (id, title, category,priority) => {
     setTasks(tasks.map(task =>
-      task._id === id ? { ...task, title, category } : task
+      task._id === id ? { ...task, title, category,priority } : task
     ));
   };
 

@@ -22,12 +22,23 @@ const TaskItem = ({ task }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(task.title);
   const [editedCategory, setEditedCategory] = useState(task.category);
+  const [editedPriority, setEditedPriority] = useState(task.priority || 'bassa');
   const { toggleTask, deleteTask, editTask, categories } = useTaskContext();
   const router = useRouter();
 
+  const priorityColors = {
+    alta: '#f44336',    // rosso
+    media: '#ff9800',   // arancione
+    bassa: '#4caf50'    // verde
+  };
+
   const handleEdit = () => {
-    if (editedTitle.trim() !== task.title || editedCategory !== task.category) {
-      editTask(task._id, editedTitle, editedCategory);
+    if (
+      editedTitle.trim() !== task.title || 
+      editedCategory !== task.category ||
+      editedPriority !== task.priority
+    ) {
+      editTask(task._id, editedTitle, editedCategory, editedPriority);
     }
     setIsEditing(false);
   };
@@ -35,6 +46,7 @@ const TaskItem = ({ task }) => {
   const handleCancel = () => {
     setEditedTitle(task.title);
     setEditedCategory(task.category);
+    setEditedPriority(task.priority || 'bassa');
     setIsEditing(false);
   };
 
@@ -42,22 +54,22 @@ const TaskItem = ({ task }) => {
     <Paper className="mb-2">
       <ListItem
         secondaryAction={
-          <div className="flex gap-1">
+          <div>
             {isEditing ? (
               <>
-                <IconButton edge="end" onClick={handleEdit}>
+                <IconButton onClick={handleEdit}>
                   <SaveIcon />
                 </IconButton>
-                <IconButton edge="end" onClick={handleCancel}>
+                <IconButton onClick={handleCancel}>
                   <CancelIcon />
                 </IconButton>
               </>
             ) : (
               <>
-                <IconButton edge="end" onClick={() => setIsEditing(true)}>
+                <IconButton onClick={() => setIsEditing(true)}>
                   <EditIcon />
                 </IconButton>
-                <IconButton edge="end" onClick={() => deleteTask(task._id)}>
+                <IconButton onClick={() => deleteTask(task._id)}>
                   <DeleteIcon />
                 </IconButton>
               </>
@@ -81,18 +93,30 @@ const TaskItem = ({ task }) => {
                 autoFocus
                 className="mb-2"
               />
-              <Select
-                size="small"
-                value={editedCategory}
-                onChange={(e) => setEditedCategory(e.target.value)}
-                fullWidth
-              >
-                {categories.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    {category}
-                  </MenuItem>
-                ))}
-              </Select>
+              <div className="flex gap-2">
+                <Select
+                  size="small"
+                  value={editedCategory}
+                  onChange={(e) => setEditedCategory(e.target.value)}
+                  fullWidth
+                >
+                  {categories.map((category) => (
+                    <MenuItem key={category} value={category}>
+                      {category}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <Select
+                  size="small"
+                  value={editedPriority}
+                  onChange={(e) => setEditedPriority(e.target.value)}
+                  style={{ minWidth: 120 }}
+                >
+                  <MenuItem value="alta">Alta</MenuItem>
+                  <MenuItem value="media">Media</MenuItem>
+                  <MenuItem value="bassa">Bassa</MenuItem>
+                </Select>
+              </div>
             </>
           ) : (
             <>
@@ -104,15 +128,24 @@ const TaskItem = ({ task }) => {
                   textDecoration: task.completed ? 'line-through' : 'none',
                 }}
               />
-              <Chip
-                label={task.category}
-                size="small"
-                className="mt-1"
-                style={{
-                  backgroundColor: task.completed ? '#e0e0e0' : '#2196f3',
-                  color: task.completed ? '#757575' : 'white',
-                }}
-              />
+              <div className="flex gap-2 mt-1">
+                <Chip
+                  label={task.category}
+                  size="small"
+                  style={{
+                    backgroundColor: task.completed ? '#e0e0e0' : '#2196f3',
+                    color: task.completed ? '#757575' : 'white',
+                  }}
+                />
+                <Chip
+                  label={`Priorità ${task.priority || 'bassa'}`}
+                  size="small"
+                  style={{
+                    backgroundColor: task.completed ? '#e0e0e0' : priorityColors[task.priority || 'bassa'],
+                    color: 'white',
+                  }}
+                />
+              </div>
             </>
           )}
         </div>
